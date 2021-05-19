@@ -7,10 +7,10 @@ ACT = [{'id': 1, 'name': 'Admin'},
        {'id': 3, 'name': 'Exit'}]
 keep = True
 while keep:
+    """
+    this is for choosing who they are
+    """
     try:
-        """
-        this is for choosing who they are
-        """
         for i in range(len(ACT)):
             choose = f"{ACT[i]['id']} - {ACT[i]['name']}"
             print(choose)
@@ -26,7 +26,7 @@ while keep:
                     print(c)
                     print("___***___")
 
-                no = int(input('choose the number of act or Enter 0 for going to main menue: '))
+                no = int(input('choose the number of act or Enter 0 for going to main menu: '))
                 if no == admin.ADMIN[0]['id']:
                     regs = admin.Admin()
                     regs.register()
@@ -42,42 +42,29 @@ while keep:
 
 
         elif add_no == ACT[1]['id']:
-            going = True
-            while going:
+            keep_it = True
+            while keep_it:
                 for i in range(len(user.CUSTOMER)):
-                    chosen_ls = f"{user.CUSTOMER[i]['id']}, {user.CUSTOMER[i]['name']}"
-                    print(chosen_ls)
+                    c = f"{user.CUSTOMER[i]['id']} - {user.CUSTOMER[i]['name']}"
+                    print(c)
                     print("___***___")
 
-                numb = int(input('choose the number of act: '))
-                if numb == user.CUSTOMER[0]['id']:
-                    reg = user.User()
+                no = int(input('choose the number of act or Enter 0 for going to main menue: '))
+                if no == user.CUSTOMER[0]['id']:
+                    reg= user.User()
                     reg.register()
 
-                elif numb == user.CUSTOMER[1]['id']:
-                    login_user = user.User()
-                    login_user.login()
+                elif no == user.CUSTOMER[1]['id']:
+                    logs = user.User()
+                    logs.login()
+                elif no == 0:
+                    keep_it = False
+                    print('Have a nice day')
 
-
-                elif numb == user.CUSTOMER[2]['id']:
-                    usr = user
-                    usr.prd_list()
-
-
-                elif numb == user.CUSTOMER[3]['id']:
-                    u = user.User()
-                    u.shopping()
-                elif numb == user.CUSTOMER[4]['id']:
-                    use = user.User()
-                    use.change_password()
-
-                else:
-                    going = False
-                    print("******you log_out successfully*****")
-                    break
-        else:
+        elif add_no == ACT[2]['id']:
             keep = False
-            print('Bye,thanks for your perchase')
+            print('*****Good bye,We hope to see you again*****')
             break
+
     except Exception:
         print('Please enter right number and valid data')

@@ -6,20 +6,23 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO, filename='new_factor.log', filemode='a', format='%(asctime)s - %(levelname)s')
 
 CUSTOMER = [{'id': 1, 'name': 'register'},
-            {'id': 2, 'name': 'login'},
-            {'id': 3, 'name': 'Show only list of product'},
-            {'id': 4, 'name': 'buy product'},
-            {'id': 5, 'name': 'change password'},
-            {'id': 6, 'name': 'log out'}]
+            {'id': 2, 'name': 'login'}]
+
+CUSTOMER_LOGGEDIN = [{'id': 1, 'name': 'Show only list of product'},
+                     {'id': 2, 'name': 'buy product'},
+                     {'id': 3, 'name': 'change password'},
+                     {'id': 4, 'name': 'log out'}]
 
 shop = [{'id': 1, 'name': 'Add item'},
         {'id': 2, 'name': 'See the factor'},
         {'id': 0, 'name': 'Exit Program'}]
 
-
+user = 0
 '''
 the function of reading csv file of product to show customer
 '''
+
+
 def prd_list():
     with open('product.csv', newline='') as p:
         p_reader = csv.DictReader(p)
@@ -33,6 +36,7 @@ def prd_list():
 
 
 class User:
+
     def __init__(self, username=None, password=None):
         self.username = username
         self.password = password
@@ -41,9 +45,6 @@ class User:
             :param username :username of customer  
             :param password : password of customer  
         """
-
-
-
 
     def register(self):
         """
@@ -74,33 +75,53 @@ class User:
             print("Please enter valid data ")
 
     def login(self):
+        global user
         """
         this fuction is for user login and checking user name and
         password that user enter is valid or not if is valid can use program
-
-        :return: data is list
         """
         try:
-            data = []
-            with open('account.csv') as csv_log:
-                reader = csv.reader(csv_log)
-                for row in reader:
-                    data.append(row)
-            un = input("please Enter user name: ")
-            pw = input('Please Enter password: ')
-            hash_pw = hashlib.sha256(pw.encode('utf8')).hexdigest()
+            loggin = 0
+            while loggin < 3 and loggin != -1:
+                with open('account.csv') as csv_log:
+                    reader = csv.reader(csv_log)
+                    un = input("please Enter user name: ")
+                    pw = input('Please Enter password: ')
+                    hash_pw = hashlib.sha256(pw.encode('utf8')).hexdigest()
+                    data = []
+                    for row in reader:
+                        data.append(row)
+                    col0 = [x[0] for x in data]
+                    col1 = [x[1] for x in data]
+                if col1.count(hash_pw) > 0 and col0.count(un) > 0\
+                        and col1[col0.index(un)] == hash_pw:
+                    print('You are logged in ')
+                    loggin = -1
+                    user = col0.index(un)
+                    going = True
+                    while going:
+                        for j in range(len(CUSTOMER_LOGGEDIN)):
+                            print(f"{CUSTOMER_LOGGEDIN[j]['id']} - {CUSTOMER_LOGGEDIN[j]['name']}")
+                            print("___***___")
+                        numb = int(input('choose the number of act: '))
+                        if numb == CUSTOMER_LOGGEDIN[0]['id']:
+                            prd_list()
 
-            col0 = [x[0] for x in data]
-            col1 = [x[1] for x in data]
-            if un in col0:
-                for k in range(len(col0)):
-                    if col0[k] == un and col1[k] == hash_pw:
-                        print('You are logged in ')
-                        login = True
-            else:
+                        elif numb == CUSTOMER_LOGGEDIN[1]['id']:
+                            self.shopping()
 
-                print('wrong username or password')
-                return data
+
+                        elif numb == CUSTOMER_LOGGEDIN[2]['id']:
+
+                            self.change_password()
+                        else:
+                            going = False
+                            print("******you log_out successfully*****")
+                            break
+                else:
+                    loggin += 1
+                    print('Please try again,Wrong user name and password')
+
         except:
             print('Please enter valid data')
 
@@ -108,7 +129,6 @@ class User:
         """
         this function is for user shopping basket after trying buy somthing can factor of it
         """
-
 
         try:
             keeping = True
@@ -151,31 +171,23 @@ class User:
             print('Please enter valid data or seprate data with (-)')
 
     def change_password(self):
-        """
-        for changing password
-        """
         try:
-            change = pd.read_csv('account.csv')
-            location = 0
-            old_password = input("Enter old password: ")
-            new_password = input("Enter new password: ")
-            hash_old_pass = hashlib.sha256(old_password.encode()).hexdigest()
-            hash_new_pass = hashlib.sha256(new_password.encode()).hexdigest()
-            with open('account.csv', 'r') as my_file:
-                csv_reader = csv.reader(my_file)
-                for row in csv_reader:
-                    print(self.password)
-                    if row[0] == self.username and row[1] == hash_old_pass:
-                        self.password = hash_new_pass
-                        print(self.password)
-                        print("Your password is changed.")
-                        change.loc[location, row[1]] = hash_new_pass
-                        change.to_csv('account.csv', index=False)
-                    location += 1
-
-
-        except Exception:
-            print('Please enter valid data')
+            global user
+            with open('account.csv') as csv_log:
+                reader = csv.reader(csv_log)
+                data = []
+                for row in reader:
+                    data.append(row)
+                col1 = [x[1] for x in data]
+                new_password = input('PLease enter new password: ')
+                hash_new_ps = hashlib.sha256(new_password.encode('utf8')).hexdigest()
+                data[user][1] = hash_new_ps
+            with open('account.csv','w', newline='') as csv_writer:
+                writer = csv.writer(csv_writer)
+                writer.writerows(data)
+                print('Password changed')
+        except:
+            print('please enter valid data')
 
 
     def __str__(self):
